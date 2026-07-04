@@ -42,6 +42,17 @@ const Linkedin = (props: React.SVGProps<SVGSVGElement>) => (
 export default function Contact() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get('name') || '';
+    const email = formData.get('email') || '';
+    const message = formData.get('message') || '';
+    
+    const mailtoUrl = `mailto:batranitika505@gmail.com?subject=Contact from ${encodeURIComponent(name as string)}&body=Name: ${encodeURIComponent(name as string)}%0DEmail: ${encodeURIComponent(email as string)}%0D%0DMessage:%0D${encodeURIComponent(message as string)}`;
+    window.location.href = mailtoUrl;
+  };
+
   return (
     <section id="contact" className="relative w-full py-32 px-4 sm:px-10 max-w-5xl mx-auto min-h-screen flex items-center justify-center">
       <motion.div 
@@ -66,11 +77,11 @@ export default function Contact() {
             </div>
 
             <div className="space-y-6">
-              <a href="mailto:hello@nitika.dev" className="flex items-center gap-4 text-white/80 hover:text-neon-cyan transition-colors group">
+              <a href="mailto:batranitika505@gmail.com" className="flex items-center gap-4 text-white/80 hover:text-neon-cyan transition-colors group">
                 <div className="p-3 rounded-full bg-white/5 border border-white/10 group-hover:border-neon-cyan transition-colors">
                   <Mail className="w-5 h-5" />
                 </div>
-                <span>hello@nitika.dev</span>
+                <span>batranitika505@gmail.com</span>
               </a>
               <div className="flex items-center gap-4 text-white/80">
                 <div className="p-3 rounded-full bg-white/5 border border-white/10">
@@ -91,14 +102,16 @@ export default function Contact() {
 
           {/* Form Side */}
           <div className="w-full md:w-1/2">
-            <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+            <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
               <div className="relative">
                 <input 
                   type="text" 
+                  name="name"
                   placeholder="Your Name"
                   onFocus={() => setFocusedField('name')}
                   onBlur={() => setFocusedField(null)}
                   className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-white/30 focus:outline-none focus:border-neon-purple transition-colors"
+                  required
                 />
                 {focusedField === 'name' && (
                   <motion.div layoutId="glow" className="absolute -inset-0.5 bg-neon-purple/50 blur opacity-50 rounded-xl -z-10" />
@@ -108,10 +121,12 @@ export default function Contact() {
               <div className="relative">
                 <input 
                   type="email" 
+                  name="email"
                   placeholder="Your Email"
                   onFocus={() => setFocusedField('email')}
                   onBlur={() => setFocusedField(null)}
                   className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-white/30 focus:outline-none focus:border-neon-blue transition-colors"
+                  required
                 />
                 {focusedField === 'email' && (
                   <motion.div layoutId="glow" className="absolute -inset-0.5 bg-neon-blue/50 blur opacity-50 rounded-xl -z-10" />
@@ -120,18 +135,20 @@ export default function Contact() {
 
               <div className="relative">
                 <textarea 
+                  name="message"
                   placeholder="Your Message"
                   rows={5}
                   onFocus={() => setFocusedField('message')}
                   onBlur={() => setFocusedField(null)}
                   className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-white/30 focus:outline-none focus:border-neon-cyan transition-colors resize-none"
+                  required
                 />
                 {focusedField === 'message' && (
                   <motion.div layoutId="glow" className="absolute -inset-0.5 bg-neon-cyan/50 blur opacity-50 rounded-xl -z-10" />
                 )}
               </div>
 
-              <button className="relative w-full py-4 rounded-xl font-bold text-black overflow-hidden group">
+              <button type="submit" className="relative w-full py-4 rounded-xl font-bold text-black overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-neon-blue via-neon-cyan to-neon-purple" />
                 <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-blue opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <span className="relative z-10 flex items-center justify-center gap-2">
