@@ -23,6 +23,7 @@ interface GithubData {
   longestStreak: number;
   contributions: ContributionDay[];
   joinedYear: number;
+  stars: number;
 }
 
 const LOCAL_OVERRIDES: Record<string, { count: number; level: number }> = {
@@ -151,10 +152,10 @@ export default function Github() {
   const fetchGithubData = async () => {
     try {
       // 1. Fetch contributions calendar
-      const calendarRes = await fetch(`https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}`);
+      const calendarRes = await fetch('/api/github-contributions');
       const calendarData = await calendarRes.json();
       
-      const rawContributions: ContributionDay[] = calendarData.contributions;
+      const rawContributions: ContributionDay[] = calendarData.contributions || [];
       
       // Sort chronologically (earliest to latest)
       const sortedContributions = rawContributions.sort((a, b) => a.date.localeCompare(b.date));
@@ -216,7 +217,8 @@ export default function Github() {
         currentStreak,
         longestStreak,
         contributions: rollingContributions,
-        joinedYear
+        joinedYear,
+        stars: starsSum
       });
     } catch (error) {
       console.error('Error fetching Github stats:', error);
@@ -393,7 +395,7 @@ export default function Github() {
                   <div className="text-[10px] text-white/40 font-mono uppercase mt-0.5">Repos</div>
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-white">0</div>
+                  <div className="text-lg font-bold text-white">{data.stars}</div>
                   <div className="text-[10px] text-white/40 font-mono uppercase mt-0.5">Stars</div>
                 </div>
                 <div>
