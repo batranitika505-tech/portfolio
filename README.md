@@ -34,7 +34,6 @@ A cinematic, premium developer portfolio built with a **futuristic space aesthet
 | **Skills** | Technology stack display |
 | **Projects** | Two featured projects with clickable 3D browser mockups |
 | **GitHub** | Live contribution calendar, streaks, and profile stats pulled from GitHub API |
-| **Experience** | Work history timeline |
 | **Education** | Academic background |
 | **Contact** | Contact form and links |
 
@@ -108,7 +107,6 @@ src/
 │   │   ├── Skills.tsx
 │   │   ├── Projects.tsx    # 3D mockups with screenshot textures
 │   │   ├── Github.tsx      # Live GitHub integration
-│   │   ├── Experience.tsx
 │   │   ├── Education.tsx
 │   │   └── Contact.tsx
 │   └── ui/
