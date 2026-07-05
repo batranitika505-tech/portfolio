@@ -156,8 +156,8 @@ export default function Hero() {
                 />
               </button>
               <a
-                href="/resume.pdf"
-                download
+                href="/nitikanew.pdf"
+                download="Nitika_Batra_Resume.pdf"
                 className="group relative px-7 py-3.5 rounded-full font-semibold text-sm overflow-hidden"
                 style={{
                   background: 'rgba(255,255,255,0.03)',

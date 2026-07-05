@@ -17,7 +17,7 @@ const PROJECTS = [
     image: '/first.png'
   },
   {
-    title: 'Architectural Design - Rennovation-Based Firm',
+    title: 'Architectural  Design - Rennovation-Based Firm',
     description: 'MCON BUILDRZ is a premium digital showcase for a high-end renovation-based firm. The application features a sophisticated architectural design language, specializing in custom builds and structural transformations that evoke inspiration and luxury.',
     tech: ['React', 'Tailwind', 'Framer Motion', 'GSAP'],
     align: 'right',
@@ -83,8 +83,8 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS[0], index: n
           <directionalLight position={[2, 5, 2]} intensity={2} color="#00f0ff" />
           <directionalLight position={[-2, -5, -2]} intensity={1} color="#b52aff" />
           <Suspense fallback={null}>
-            <BrowserMockup 
-              imageUrl={project.image} 
+            <BrowserMockup
+              imageUrl={project.image}
               onClick={() => window.open(project.demoUrl, '_blank')}
             />
           </Suspense>
