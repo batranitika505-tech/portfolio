@@ -2,39 +2,29 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { parseTerminalCommand } from '@/lib/portfolio-utils';
 
 interface CommandOutput {
   text: string;
   type: 'input' | 'output' | 'error' | 'success';
 }
 
-const SECTION_COMMANDS: Record<string, string> = {
-  about: 'about',
-  skills: 'skills',
-  projects: 'featured work',
-  work: 'featured work',
-  contact: 'contact',
-};
-
-function scrollToSection(sectionKeyword: string): boolean {
+function scrollToSection(sectionTarget: string): boolean {
+  const el = document.getElementById(sectionTarget);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' });
+    return true;
+  }
   const sections = Array.from(document.querySelectorAll('section'));
   for (const sec of sections) {
     const text = sec.textContent?.toLowerCase() || '';
-    if (text.includes(sectionKeyword.toLowerCase())) {
+    if (text.includes(sectionTarget.toLowerCase())) {
       sec.scrollIntoView({ behavior: 'smooth' });
       return true;
     }
   }
   return false;
 }
-
-const COMMAND_RESPONSES: Record<string, string[]> = {
-  resume: [
-    "Retrieving resume link...",
-    "SUCCESS: Resume generated successfully.",
-    "Link: [Click here to view PDF] (Redirecting to /resume.pdf...)"
-  ]
-};
 
 export default function InteractiveTerminal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +41,15 @@ export default function InteractiveTerminal() {
   // Toggle terminal on tilde (~) key or backtick (`)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === '`1' || e.key === '`' || e.key === '~') {
+      const target = e.target as HTMLElement | null;
+      const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable);
+
+      // Never intercept keystrokes if the user is typing inside any form field on the page
+      if (isInput && target !== inputRef.current) {
+        return;
+      }
+
+      if (e.key === '`' || e.key === '~') {
         e.preventDefault();
         setIsOpen((prev) => !prev);
       }
@@ -86,10 +84,9 @@ export default function InteractiveTerminal() {
     setCommandHistory((prev) => [cmd, ...prev]);
     setHistoryIndex(-1);
 
-    const args = trimmedCmd.split(' ');
-    const mainCommand = args[0];
+    const action = parseTerminalCommand(trimmedCmd);
 
-    switch (mainCommand) {
+    switch (action.type) {
       case 'help':
         setHistory((prev) => [
           ...prev,
@@ -97,8 +94,10 @@ export default function InteractiveTerminal() {
           { text: "  about        - Navigate to the About section", type: 'output' },
           { text: "  skills       - Navigate to the Skills section", type: 'output' },
           { text: "  projects     - Navigate to the Projects section", type: 'output' },
+          { text: "  education    - Navigate to the Education section", type: 'output' },
+          { text: "  github       - Navigate to the GitHub section", type: 'output' },
           { text: "  contact      - Navigate to the Contact section", type: 'output' },
-          { text: "  resume       - Get link to professional resume", type: 'output' },
+          { text: "  resume       - Open & download professional resume", type: 'output' },
           { text: "  clear        - Clear terminal log screen", type: 'output' },
           { text: "  exit / close - Close the terminal window", type: 'output' }
         ]);
@@ -107,37 +106,33 @@ export default function InteractiveTerminal() {
         setHistory([]);
         break;
       case 'exit':
-      case 'close':
         setIsOpen(false);
         break;
-      case 'about':
-      case 'skills':
-      case 'projects':
-      case 'work':
-      case 'contact': {
-        const keyword = SECTION_COMMANDS[mainCommand];
-        const found = scrollToSection(keyword);
+      case 'resume':
+        setHistory((prev) => [
+          ...prev,
+          { text: "Opening Nitika's resume (/resume.pdf)...", type: 'success' },
+          { text: "If the popup was blocked, you can access it directly at: /resume.pdf", type: 'output' }
+        ]);
+        if (typeof window !== 'undefined') {
+          window.open('/resume.pdf', '_blank');
+        }
+        break;
+      case 'navigate': {
+        const found = scrollToSection(action.section);
         if (found) {
-          setHistory((prev) => [...prev, { text: `Navigating to '${mainCommand}' section...`, type: 'success' }]);
+          setHistory((prev) => [...prev, { text: `Navigating to '${action.section}' section...`, type: 'success' }]);
           setTimeout(() => setIsOpen(false), 600);
         } else {
-          setHistory((prev) => [...prev, { text: `Error: Could not find '${mainCommand}' section.`, type: 'error' }]);
+          setHistory((prev) => [...prev, { text: `Error: Could not find '${action.section}' section.`, type: 'error' }]);
         }
         break;
       }
       default:
-        if (COMMAND_RESPONSES[mainCommand]) {
-          const lines = COMMAND_RESPONSES[mainCommand];
-          setHistory((prev) => [
-            ...prev,
-            ...lines.map((line) => ({ text: line, type: 'output' as const }))
-          ]);
-        } else {
-          setHistory((prev) => [
-            ...prev,
-            { text: `bash: command not found: ${mainCommand}. Type 'help' for options.`, type: 'error' }
-          ]);
-        }
+        setHistory((prev) => [
+          ...prev,
+          { text: `bash: command not found: ${action.command || trimmedCmd}. Type 'help' for options.`, type: 'error' }
+        ]);
     }
 
     setInput('');
@@ -198,6 +193,7 @@ export default function InteractiveTerminal() {
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
+                aria-label="Close terminal"
                 className="text-white/40 hover:text-white transition-colors text-sm"
               >
                 ✕

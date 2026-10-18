@@ -1,8 +1,8 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef, useState } from 'react';
-
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { useRef } from 'react';
+import Image from 'next/image';
 
 export default function About() {
   const containerRef = useRef<HTMLElement>(null);
@@ -14,9 +14,11 @@ export default function About() {
   const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
 
-  // Mouse tilt effect
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
+  // High-performance spring-lagged mouse tilt effect
+  const rotX = useMotionValue(0);
+  const rotY = useMotionValue(0);
+  const springRotateX = useSpring(rotX, { stiffness: 250, damping: 25 });
+  const springRotateY = useSpring(rotY, { stiffness: 250, damping: 25 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -25,13 +27,13 @@ export default function About() {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    setRotateX(-((y - centerY) / 20));
-    setRotateY((x - centerX) / 20);
+    rotX.set(-((y - centerY) / 20));
+    rotY.set((x - centerX) / 20);
   };
 
   const handleMouseLeave = () => {
-    setRotateX(0);
-    setRotateY(0);
+    rotX.set(0);
+    rotY.set(0);
   };
 
   const textLines = [
@@ -50,16 +52,18 @@ export default function About() {
         <motion.div
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          animate={{ rotateX, rotateY }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          style={{ rotateX: springRotateX, rotateY: springRotateY }}
           className="relative w-full rounded-3xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 shadow-[0_0_50px_rgba(0,240,255,0.1)] p-8 md:p-12 flex flex-col md:flex-row gap-10"
         >
           {/* Image Side */}
           <div className="w-full md:w-1/2 h-[300px] md:h-[500px] relative rounded-2xl overflow-hidden bg-black/20 border border-white/5 shadow-inner">
-            <img
-              src="/profile.png"
-              alt="Nitika"
-              className="w-full h-full object-cover rounded-2xl filter brightness-90 contrast-105 hover:scale-105 transition-transform duration-700"
+            <Image
+              src="/profile.webp"
+              alt="Nitika - Software Engineer"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+              className="object-cover rounded-2xl filter brightness-90 contrast-105 hover:scale-105 transition-transform duration-700"
             />
             {/* Futuristic overlay lines */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
@@ -99,7 +103,10 @@ export default function About() {
               viewport={{ once: true }}
               transition={{ delay: 1 }}
             >
-              <button className="px-8 py-3 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors relative overflow-hidden group">
+              <button 
+                onClick={() => document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-8 py-3 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors relative overflow-hidden group cursor-pointer"
+              >
                 <span className="relative z-10">Discover More</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-neon-blue to-neon-purple opacity-0 group-hover:opacity-20 transition-opacity" />
               </button>

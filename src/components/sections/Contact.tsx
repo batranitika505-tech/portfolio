@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Mail, MapPin, FileText, Send, X, CheckCircle } from 'lucide-react';
 import { useState, useRef } from 'react';
+import { validateContactForm } from '@/lib/portfolio-utils';
 
 const GitIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -42,12 +43,26 @@ const Linkedin = (props: React.SVGProps<SVGSVGElement>) => (
 export default function Contact() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileError(null);
     if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      const validation = validateContactForm({
+        name: 'test',
+        email: 'test@example.com',
+        message: 'test',
+        file: { name: file.name, size: file.size }
+      });
+      if (validation.errors.file) {
+        setFileError(validation.errors.file);
+        e.target.value = '';
+        return;
+      }
+      setSelectedFile(file);
     }
   };
 
@@ -55,6 +70,7 @@ export default function Contact() {
     e.preventDefault();
     e.stopPropagation();
     setSelectedFile(null);
+    setFileError(null);
     const input = document.getElementById('resume-upload') as HTMLInputElement;
     if (input) {
       input.value = '';
@@ -63,9 +79,35 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus('sending');
 
     const formData = new FormData(e.currentTarget);
+
+    // Anti-spam honeypot verification
+    const honey = formData.get('_honey');
+    if (honey) {
+      setStatus('success');
+      formRef.current?.reset();
+      return;
+    }
+
+    const name = String(formData.get('name') || '');
+    const email = String(formData.get('email') || '');
+    const message = String(formData.get('message') || '');
+
+    const validation = validateContactForm({
+      name,
+      email,
+      message,
+      file: selectedFile ? { name: selectedFile.name, size: selectedFile.size } : null,
+    });
+
+    if (!validation.isValid) {
+      const firstError = Object.values(validation.errors)[0];
+      setFileError(firstError);
+      return;
+    }
+
+    setStatus('sending');
 
     // Manually append file from state (file input is outside the <form> element)
     if (selectedFile) {
@@ -73,7 +115,7 @@ export default function Contact() {
     }
 
     // FormSubmit.co configuration fields
-    formData.append('_subject', `Portfolio Contact from ${formData.get('name')}`);
+    formData.append('_subject', `Portfolio Contact from ${name}`);
     formData.append('_captcha', 'false');
     formData.append('_template', 'table');
 
@@ -81,7 +123,6 @@ export default function Contact() {
       const res = await fetch('https://formsubmit.co/ajax/batranitika505@gmail.com', {
         method: 'POST',
         body: formData,
-        // Do NOT set Content-Type — browser must set multipart boundary automatically
       });
 
       if (res.ok) {
@@ -143,6 +184,7 @@ export default function Contact() {
                   href="https://github.com/batranitika505-tech"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Visit Nitika's GitHub profile"
                   className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:-translate-y-1 transition-all hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] cursor-none"
                 >
                   <GitIcon className="w-6 h-6 text-white" />
@@ -151,38 +193,45 @@ export default function Contact() {
                   href="https://www.linkedin.com/in/nitika-batra-aa0b52246"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Visit Nitika's LinkedIn profile"
                   className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:-translate-y-1 transition-all hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] cursor-none"
                 >
                   <Linkedin className="w-6 h-6 text-white" />
                 </a>
               </div>
 
-              <div className="relative flex items-center gap-2">
-                <input
-                  type="file"
-                  id="resume-upload"
-                  name="attachment"
-                  className="hidden"
-                  accept=".pdf,.doc,.docx"
-                  onChange={handleFileChange}
-                />
-                <label
-                  htmlFor="resume-upload"
-                  className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-neon-cyan hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300 cursor-none text-sm font-medium text-white/80 hover:text-white"
-                >
-                  <FileText className="w-5 h-5 text-neon-cyan" />
-                  {selectedFile ? `Selected: ${selectedFile.name.substring(0, 15)}${selectedFile.name.length > 15 ? '...' : ''}` : 'Upload Resume'}
-                </label>
-
-                {selectedFile && (
-                  <button
-                    type="button"
-                    onClick={handleCancelFile}
-                    className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all duration-300 cursor-none flex items-center justify-center"
-                    title="Remove selected file"
+              <div className="relative flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    id="resume-upload"
+                    name="attachment"
+                    className="hidden"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleFileChange}
+                  />
+                  <label
+                    htmlFor="resume-upload"
+                    className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-neon-cyan hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300 cursor-none text-sm font-medium text-white/80 hover:text-white"
                   >
-                    <X className="w-4 h-4" />
-                  </button>
+                    <FileText className="w-5 h-5 text-neon-cyan" />
+                    {selectedFile ? `Selected: ${selectedFile.name.substring(0, 15)}${selectedFile.name.length > 15 ? '...' : ''}` : 'Upload Document'}
+                  </label>
+
+                  {selectedFile && (
+                    <button
+                      type="button"
+                      onClick={handleCancelFile}
+                      aria-label="Remove selected attachment"
+                      className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all duration-300 cursor-none flex items-center justify-center"
+                      title="Remove selected file"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {fileError && (
+                  <p className="text-xs text-red-400 font-mono mt-1">{fileError}</p>
                 )}
               </div>
             </div>
@@ -196,6 +245,8 @@ export default function Contact() {
               onSubmit={handleSubmit}
               encType="multipart/form-data"
             >
+              {/* Anti-spam honeypot */}
+              <input type="text" name="_honey" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
               <div className="relative">
                 <input
                   type="text"

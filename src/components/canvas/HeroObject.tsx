@@ -16,7 +16,7 @@ function OrbitalRing({ radius, tiltX, tiltZ, speed, color }: {
   speed: number;
   color: string;
 }) {
-  const ref = useRef<THREE.Mesh>(null);
+  const ref = useRef<THREE.LineLoop>(null);
 
   useFrame((_, delta) => {
     if (ref.current) {
@@ -39,16 +39,16 @@ function OrbitalRing({ radius, tiltX, tiltZ, speed, color }: {
   }, [points]);
 
   return (
-    <mesh ref={ref} rotation={[tiltX, 0, tiltZ]}>
+    <lineLoop ref={ref} rotation={[tiltX, 0, tiltZ]}>
       <primitive object={geometry} attach="geometry" />
       <lineBasicMaterial color={color} transparent opacity={0.6} />
-    </mesh>
+    </lineLoop>
   );
 }
 
 function GlowCore({ mouseX, mouseY }: HeroObjectProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const innerRef = useRef<THREE.Mesh>(null);
+  const innerRef = useRef<THREE.Group>(null);
   const outerRef = useRef<THREE.Mesh>(null);
 
   useFrame((state, delta) => {
@@ -84,30 +84,30 @@ function GlowCore({ mouseX, mouseY }: HeroObjectProps) {
         />
       </mesh>
 
-      {/* Inner solid core */}
-      <mesh ref={innerRef}>
-        <icosahedronGeometry args={[0.9, 1]} />
-        <meshStandardMaterial
-          color="#050520"
-          emissive="#4400ff"
-          emissiveIntensity={0.8}
-          roughness={0.1}
-          metalness={0.9}
-        />
-      </mesh>
-
-      {/* Inner wireframe overlay */}
-      <mesh ref={innerRef}>
-        <icosahedronGeometry args={[0.91, 1]} />
-        <meshStandardMaterial
-          color="#b52aff"
-          wireframe
-          transparent
-          opacity={0.5}
-          emissive="#b52aff"
-          emissiveIntensity={1}
-        />
-      </mesh>
+      {/* Inner core group containing both solid core and wireframe overlay */}
+      <group ref={innerRef}>
+        <mesh>
+          <icosahedronGeometry args={[0.9, 1]} />
+          <meshStandardMaterial
+            color="#050520"
+            emissive="#4400ff"
+            emissiveIntensity={0.8}
+            roughness={0.1}
+            metalness={0.9}
+          />
+        </mesh>
+        <mesh>
+          <icosahedronGeometry args={[0.91, 1]} />
+          <meshStandardMaterial
+            color="#b52aff"
+            wireframe
+            transparent
+            opacity={0.5}
+            emissive="#b52aff"
+            emissiveIntensity={1}
+          />
+        </mesh>
+      </group>
 
       {/* Orbital rings */}
       <OrbitalRing radius={2.2} tiltX={Math.PI / 5} tiltZ={0} speed={0.4} color="#00f0ff" />

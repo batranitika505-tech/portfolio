@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import * as THREE from 'three';
 import Galaxy from './Galaxy';
 
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect } from 'react';
 
 function SpaceEnvironment() {
   const starsRef = useRef<THREE.Group>(null);
@@ -14,16 +14,16 @@ function SpaceEnvironment() {
   const dirLight2Ref = useRef<THREE.DirectionalLight>(null);
   const ambientLightRef = useRef<THREE.AmbientLight>(null);
 
-  const [scrollRatio, setScrollRatio] = useState(0);
+  const scrollRatioRef = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       if (maxScroll > 0) {
-        setScrollRatio(window.scrollY / maxScroll);
+        scrollRatioRef.current = window.scrollY / maxScroll;
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Initial check
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -40,6 +40,13 @@ function SpaceEnvironment() {
     nebulaPink: new THREE.Color('#14021a')
   }), []);
 
+  const scratchColors = useMemo(() => ({
+    bg: new THREE.Color(),
+    light1: new THREE.Color(),
+    light2: new THREE.Color(),
+    ambient: new THREE.Color(),
+  }), []);
+
   useFrame((state, delta) => {
     if (starsRef.current) {
       // Slow rotation for parallax effect
@@ -52,48 +59,44 @@ function SpaceEnvironment() {
       state.camera.lookAt(0, 0, 0);
     }
 
-    const r = scrollRatio;
+    const r = scrollRatioRef.current;
 
     // Transition background clear color
-    const bgCol = new THREE.Color();
     if (r < 0.5) {
-      bgCol.lerpColors(colors.spaceBlack, colors.nebulaPurple, r * 2);
+      scratchColors.bg.lerpColors(colors.spaceBlack, colors.nebulaPurple, r * 2);
     } else {
-      bgCol.lerpColors(colors.nebulaPurple, colors.nebulaPink, (r - 0.5) * 2);
+      scratchColors.bg.lerpColors(colors.nebulaPurple, colors.nebulaPink, (r - 0.5) * 2);
     }
-    state.gl.setClearColor(bgCol);
+    state.gl.setClearColor(scratchColors.bg);
 
     // Transition Directional Light 1 color (cyan -> purple -> pink)
     if (dirLight1Ref.current) {
-      const c = new THREE.Color();
       if (r < 0.5) {
-        c.lerpColors(colors.cyan, colors.purple, r * 2);
+        scratchColors.light1.lerpColors(colors.cyan, colors.purple, r * 2);
       } else {
-        c.lerpColors(colors.purple, colors.pink, (r - 0.5) * 2);
+        scratchColors.light1.lerpColors(colors.purple, colors.pink, (r - 0.5) * 2);
       }
-      dirLight1Ref.current.color.copy(c);
+      dirLight1Ref.current.color.copy(scratchColors.light1);
     }
 
     // Transition Directional Light 2 color (purple -> cyan -> deep purple)
     if (dirLight2Ref.current) {
-      const c = new THREE.Color();
       if (r < 0.5) {
-        c.lerpColors(colors.purple, colors.cyan, r * 2);
+        scratchColors.light2.lerpColors(colors.purple, colors.cyan, r * 2);
       } else {
-        c.lerpColors(colors.cyan, colors.deepPurple, (r - 0.5) * 2);
+        scratchColors.light2.lerpColors(colors.cyan, colors.deepPurple, (r - 0.5) * 2);
       }
-      dirLight2Ref.current.color.copy(c);
+      dirLight2Ref.current.color.copy(scratchColors.light2);
     }
 
     // Transition Ambient Light color (deep space blue -> nebula purple -> deep pink)
     if (ambientLightRef.current) {
-      const c = new THREE.Color();
       if (r < 0.5) {
-        c.lerpColors(colors.deepBlue, colors.deepPurple, r * 2);
+        scratchColors.ambient.lerpColors(colors.deepBlue, colors.deepPurple, r * 2);
       } else {
-        c.lerpColors(colors.deepPurple, colors.deepPink, (r - 0.5) * 2);
+        scratchColors.ambient.lerpColors(colors.deepPurple, colors.deepPink, (r - 0.5) * 2);
       }
-      ambientLightRef.current.color.copy(c);
+      ambientLightRef.current.color.copy(scratchColors.ambient);
     }
   });
 
@@ -119,7 +122,11 @@ function SpaceEnvironment() {
 export default function Scene() {
   return (
     <div className="fixed inset-0 z-[-1] pointer-events-none bg-black">
-      <Canvas camera={{ position: [0, 0, 10], fov: 75 }}>
+      <Canvas 
+        camera={{ position: [0, 0, 10], fov: 75 }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: false, powerPreference: 'high-performance' }}
+      >
         <SpaceEnvironment />
         <Preload all />
       </Canvas>

@@ -1,14 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { GitCommit, Star, Users, FolderKanban, Activity, Flame, Trophy, MapPin, Calendar, ArrowUpRight, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Activity, Flame, Trophy, MapPin, Calendar, ArrowUpRight, RefreshCw } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
 
-interface ContributionDay {
-  date: string;
-  count: number;
-  level: number;
-}
+import { calculateStreaks, ContributionDay } from '@/lib/portfolio-utils';
 
 interface GithubData {
   avatarUrl: string;
@@ -46,45 +43,6 @@ function getLevelStyle(level: number): React.CSSProperties {
     backgroundColor: LEVEL_COLORS[level] ?? LEVEL_COLORS[0],
     borderRadius: '2px',
   };
-}
-
-function calculateStreaks(contributions: ContributionDay[]) {
-  let longestStreak = 0;
-  let tempStreak = 0;
-
-  // contributions are sorted chronologically
-  contributions.forEach((day) => {
-    if (day.count > 0) {
-      tempStreak++;
-      if (tempStreak > longestStreak) {
-        longestStreak = tempStreak;
-      }
-    } else {
-      tempStreak = 0;
-    }
-  });
-
-  const todayStr = new Date().toISOString().split('T')[0];
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-  let currentStreak = 0;
-  const revContribs = [...contributions].reverse();
-  const hasRecentCommits = revContribs.some(c => (c.date === todayStr || c.date === yesterdayStr) && c.count > 0);
-
-  if (hasRecentCommits) {
-    for (const day of revContribs) {
-      if (day.date > todayStr) continue;
-      if (day.count > 0) {
-        currentStreak++;
-      } else {
-        if (currentStreak > 0) break;
-      }
-    }
-  }
-
-  return { currentStreak, longestStreak };
 }
 
 function GithubSkeleton() {
@@ -149,92 +107,113 @@ export default function Github() {
     });
   };
 
-  const fetchGithubData = async () => {
+  const processPayload = useCallback((calendarData: {
+    contributions?: ContributionDay[];
+    profile?: {
+      avatarUrl?: string;
+      name?: string;
+      login?: string;
+      location?: string;
+      publicRepos?: number;
+      followers?: number;
+      following?: number;
+      joinedYear?: number;
+      stars?: number;
+    };
+  }) => {
+    const rawContributions: ContributionDay[] = calendarData.contributions || [];
+    const profileData = calendarData.profile || {};
+    
+    // Sort chronologically (earliest to latest)
+    const sortedContributions = rawContributions.sort((a, b) => a.date.localeCompare(b.date));
+
+    // Get local today's date in YYYY-MM-DD
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
+
+    // Filter to keep only days up to today
+    const pastAndPresentContributions = sortedContributions.filter(c => c.date <= todayStr);
+
+    // Apply overrides
+    const overriddenContributions = pastAndPresentContributions.map(item => {
+      if (LOCAL_OVERRIDES[item.date]) {
+        return {
+          ...item,
+          count: LOCAL_OVERRIDES[item.date].count,
+          level: LOCAL_OVERRIDES[item.date].level
+        };
+      }
+      return item;
+    });
+
+    // Slices last 371 days ending on today (to show 53 weeks)
+    const rollingContributions = overriddenContributions.slice(-371);
+    const totalInYear = rollingContributions.reduce((acc, curr) => acc + curr.count, 0);
+
+    // Streaks calculation
+    const { currentStreak, longestStreak } = calculateStreaks(overriddenContributions);
+
+    setData({
+      avatarUrl: profileData.avatarUrl || 'https://avatars.githubusercontent.com/u/228721586?v=4',
+      name: profileData.name || 'Nitika',
+      login: profileData.login || GITHUB_USERNAME,
+      location: profileData.location || 'India',
+      publicRepos: profileData.publicRepos || 0,
+      followers: profileData.followers || 0,
+      following: profileData.following || 0,
+      totalContributions: totalInYear,
+      currentStreak,
+      longestStreak,
+      contributions: rollingContributions,
+      joinedYear: profileData.joinedYear || 2025,
+      stars: profileData.stars || 0
+    });
+  }, []);
+
+  const loadGithubData = useCallback(async (refresh = false) => {
     try {
-      // 1. Fetch contributions calendar
-      const calendarRes = await fetch('/api/github-contributions');
-      const calendarData = await calendarRes.json();
-      
-      const rawContributions: ContributionDay[] = calendarData.contributions || [];
-      
-      // Sort chronologically (earliest to latest)
-      const sortedContributions = rawContributions.sort((a, b) => a.date.localeCompare(b.date));
-
-      // Get local today's date in YYYY-MM-DD
-      const d = new Date();
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      const todayStr = `${year}-${month}-${day}`;
-
-      // Filter to keep only days up to today
-      const pastAndPresentContributions = sortedContributions.filter(c => c.date <= todayStr);
-
-      // Apply overrides (e.g. for private contributions not scraped by the public API)
-      const overriddenContributions = pastAndPresentContributions.map(day => {
-        if (LOCAL_OVERRIDES[day.date]) {
-          return {
-            ...day,
-            count: LOCAL_OVERRIDES[day.date].count,
-            level: LOCAL_OVERRIDES[day.date].level
-          };
-        }
-        return day;
-      });
-
-      // Slices last 371 days ending on today (to show 53 weeks)
-      const rollingContributions = overriddenContributions.slice(-371);
-      
-      const totalInYear = rollingContributions.reduce((acc, curr) => acc + curr.count, 0);
-
-      // 2. Fetch user profile
-      const profileRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`);
-      const profileData = await profileRes.json();
-
-      // 3. Fetch user repositories (to calculate total stars)
-      const reposRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100`);
-      const reposData = await reposRes.json();
-      const starsSum = Array.isArray(reposData) 
-        ? reposData.reduce((acc, curr) => acc + (curr.stargazers_count || 0), 0)
-        : 0;
-
-      // Streaks calculation (using all historical data up to today for accurate streak logs)
-      const { currentStreak, longestStreak } = calculateStreaks(overriddenContributions);
-
-      const joinedYear = profileData.created_at 
-        ? new Date(profileData.created_at).getFullYear() 
-        : 2025;
-
-      setData({
-        avatarUrl: profileData.avatar_url || 'https://avatars.githubusercontent.com/u/228721586?v=4',
-        name: profileData.name || 'Nitika',
-        login: profileData.login || GITHUB_USERNAME,
-        location: profileData.location || 'India',
-        publicRepos: profileData.public_repos || 0,
-        followers: profileData.followers || 0,
-        following: profileData.following || 0,
-        totalContributions: totalInYear,
-        currentStreak,
-        longestStreak,
-        contributions: rollingContributions,
-        joinedYear,
-        stars: starsSum
-      });
+      if (refresh) setRefreshing(true);
+      const res = await fetch(`/api/github-contributions${refresh ? '?refresh=true' : ''}`);
+      if (!res.ok) throw new Error('Failed to fetch from GitHub API route');
+      const payload = await res.json();
+      processPayload(payload);
     } catch (error) {
       console.error('Error fetching Github stats:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [processPayload]);
 
   useEffect(() => {
-    fetchGithubData();
-  }, []);
+    let ignore = false;
+    const fetchInitial = async () => {
+      try {
+        const res = await fetch('/api/github-contributions');
+        if (!res.ok) throw new Error('API fetch failed');
+        const payload = await res.json();
+        if (!ignore) {
+          processPayload(payload);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!ignore) {
+          console.error(err);
+          setLoading(false);
+        }
+      }
+    };
+    fetchInitial();
+    return () => {
+      ignore = true;
+    };
+  }, [processPayload]);
 
   const handleSync = () => {
-    setRefreshing(true);
-    fetchGithubData();
+    loadGithubData(true);
   };
 
   // Group daily contributions into columns/weeks (each week has 7 days)
@@ -256,10 +235,21 @@ export default function Github() {
               {week.map((day) => (
                 <div
                   key={day.date}
-                  className="w-[11px] h-[11px] transition-all duration-200 hover:scale-125 hover:brightness-125"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${day.count} contributions on ${formatDate(day.date)}`}
+                  className="w-[11px] h-[11px] transition-all duration-200 hover:scale-125 hover:brightness-125 cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-400"
                   style={getLevelStyle(day.level)}
                   onMouseEnter={(e) => handleMouseEnter(e, day)}
                   onMouseLeave={handleMouseLeave}
+                  onClick={() => {
+                    window.open(`https://github.com/${GITHUB_USERNAME}?tab=overview&from=${day.date}&to=${day.date}`, '_blank', 'noopener,noreferrer');
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      window.open(`https://github.com/${GITHUB_USERNAME}?tab=overview&from=${day.date}&to=${day.date}`, '_blank', 'noopener,noreferrer');
+                    }
+                  }}
                 />
               ))}
             </div>
@@ -282,7 +272,7 @@ export default function Github() {
               {formatDate(hoveredDay.day.date)}
             </div>
             <div className="text-[9px] text-white/40 italic mt-1 whitespace-nowrap">
-              Click to view details
+              Click to open day on GitHub
             </div>
           </div>
         )}
@@ -291,7 +281,7 @@ export default function Github() {
   };
 
   return (
-    <section id="projects" className="relative w-full py-32 px-4 sm:px-10 max-w-6xl mx-auto flex flex-col justify-center">
+    <section id="github" className="relative w-full py-32 px-4 sm:px-10 max-w-6xl mx-auto flex flex-col justify-center">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16">
         <div>
@@ -372,10 +362,12 @@ export default function Github() {
               className="p-8 rounded-3xl backdrop-blur-xl bg-black/40 border border-white/10 shadow-2xl flex flex-col justify-between"
             >
               <div className="flex items-center gap-4">
-                <img 
+                <Image 
                   src={data.avatarUrl} 
                   alt={data.name} 
-                  className="w-16 h-16 rounded-2xl border border-white/10 object-cover"
+                  width={64}
+                  height={64}
+                  className="rounded-2xl border border-white/10 object-cover"
                 />
                 <div>
                   <h4 className="text-lg font-bold text-white leading-tight">{data.name}</h4>

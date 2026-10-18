@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const EDUCATION = [
   {
-    college: 'Nrewton School of Technology',
+    college: 'Newton School of Technology',
     degree: 'B.Tech Computer Science',
     years: '2025 - 2029',
     achievements: 'CGPA: 9.14 / 10',
@@ -14,7 +14,7 @@ const EDUCATION = [
 
 export default function Education() {
   return (
-    <section className="relative w-full py-32 px-4 sm:px-10 max-w-4xl mx-auto flex flex-col justify-center">
+    <section id="education" className="relative w-full py-32 px-4 sm:px-10 max-w-4xl mx-auto flex flex-col justify-center">
       <div className="text-center mb-24">
         <h2 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/30">
           Education
@@ -22,7 +22,7 @@ export default function Education() {
       </div>
 
       <div className="space-y-16">
-        {EDUCATION.map((edu, index) => (
+        {EDUCATION.map((edu) => (
           <motion.div
             key={edu.college}
             initial={{ opacity: 0, y: 50 }}

@@ -22,7 +22,6 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
-  cursor: none; /* We will use a custom cursor */
 }
 
 /* Custom Selection */
@@ -46,9 +45,11 @@ body {
   background: #555;
 }
 
-/* Hide default cursor globally */
-* {
-  cursor: none !important;
+/* Custom cursor only on fine-pointer devices with hover capability */
+@media (hover: hover) and (pointer: fine) {
+  body, * {
+    cursor: none !important;
+  }
 }
 
 /* ── Hero Name Sheen ─────────────────────────────────── */

@@ -4,35 +4,46 @@ import { useFrame } from '@react-three/fiber';
 import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 
+function createSeededRandom(seed: number) {
+  let s = seed % 2147483647;
+  if (s <= 0) s += 2147483646;
+  return () => {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
 export default function Galaxy() {
   const pointsRef = useRef<THREE.Points>(null);
 
   const { positions, colors } = useMemo(() => {
+    const rand = createSeededRandom(1337);
     const count = 3000;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     
     const colorInside = new THREE.Color('#b52aff');
     const colorOutside = new THREE.Color('#00f0ff');
+    const mixedColor = new THREE.Color();
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       
       // Position
-      const radius = Math.random() * 20;
+      const radius = rand() * 20;
       const spinAngle = radius * 0.5;
       const branchAngle = ((i % 3) / 3) * Math.PI * 2;
       
-      const randomX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 2;
-      const randomY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 2;
-      const randomZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * 2;
+      const randomX = Math.pow(rand(), 3) * (rand() < 0.5 ? 1 : -1) * 2;
+      const randomY = Math.pow(rand(), 3) * (rand() < 0.5 ? 1 : -1) * 2;
+      const randomZ = Math.pow(rand(), 3) * (rand() < 0.5 ? 1 : -1) * 2;
 
       positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
       positions[i3 + 1] = randomY;
       positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
 
       // Color
-      const mixedColor = colorInside.clone();
+      mixedColor.copy(colorInside);
       mixedColor.lerp(colorOutside, radius / 20);
       
       colors[i3] = mixedColor.r;

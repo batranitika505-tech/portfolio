@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 
 // ─── Physics ─────────────────────────────────────────────────────────────────
-const TRAIL_LENGTH    = 36;   // number of spring-lagged positions stored
-const STIFFNESS       = 0.10; // spring stiffness (lower = more lag)
-const DAMPING         = 0.72; // velocity damping (lower = more oscillation)
-const MIN_MOVE        = 0.3;  // minimum pixel delta to add a new trail point
+const TRAIL_LENGTH    = 18;   // number of spring-lagged positions stored (tight, swift ribbon)
+const STIFFNESS       = 0.40; // spring stiffness (higher = instant, responsive tracking)
+const DAMPING         = 0.62; // velocity damping (clean stop without sluggish floatiness)
+const MIN_MOVE        = 0.5;  // minimum pixel delta to add a new trail point
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 interface Pt { x: number; y: number }
@@ -56,7 +56,28 @@ function segmentColor(t: number): [number, number, number] {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
+
+// Detect fine pointer + no reduced motion via useSyncExternalStore (avoids setState in effect)
+function subscribeToMediaChange(cb: () => void) {
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  finePointer.addEventListener('change', cb);
+  reducedMotion.addEventListener('change', cb);
+  return () => {
+    finePointer.removeEventListener('change', cb);
+    reducedMotion.removeEventListener('change', cb);
+  };
+}
+function getMediaSnapshot(): boolean {
+  if (typeof window === 'undefined') return false;
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return isFinePointer && !isReducedMotion;
+}
+const serverSnapshot = () => false;
+
 export default function CustomCursor() {
+  const enabled = useSyncExternalStore(subscribeToMediaChange, getMediaSnapshot, serverSnapshot);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Refs that live in the rAF loop (no re-renders needed)
@@ -69,6 +90,8 @@ export default function CustomCursor() {
 
   // ── Mouse / hover listeners ──────────────────────────────────────────────
   useEffect(() => {
+    if (!enabled) return;
+
     const onMove = (e: MouseEvent) => {
       mouse.current = { x: e.clientX, y: e.clientY };
     };
@@ -84,10 +107,12 @@ export default function CustomCursor() {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseover', onOver);
     };
-  }, []);
+  }, [enabled]);
 
   // ── Canvas render loop ───────────────────────────────────────────────────
   useEffect(() => {
+    if (!enabled) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -113,9 +138,6 @@ export default function CustomCursor() {
       sp.x += v.x;
       sp.y += v.y;
 
-      // Speed-based extra inertia: fast movement lags more
-      const speed = Math.sqrt(v.x * v.x + v.y * v.y);
-
       // ── Update trail ring ─────────────────────────────────────────────
       const tr = trail.current;
       const last = tr[tr.length - 1];
@@ -129,7 +151,7 @@ export default function CustomCursor() {
 
       if (tr.length < 3) { raf.current = requestAnimationFrame(tick); return; }
 
-      const spline = buildSpline(tr, 5);
+      const spline = buildSpline(tr, 4);
       const n      = spline.length;
 
       const h = hovered.current;
@@ -209,7 +231,9 @@ export default function CustomCursor() {
       cancelAnimationFrame(raf.current);
       window.removeEventListener('resize', resize);
     };
-  }, []);
+  }, [enabled]);
+
+  if (!enabled) return null;
 
   return (
     <canvas

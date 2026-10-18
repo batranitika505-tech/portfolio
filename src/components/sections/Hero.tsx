@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import HeroObject from '@/components/canvas/HeroObject';
 
@@ -27,7 +27,7 @@ function ParticleScrollIndicator() {
                 background: 'linear-gradient(to bottom, transparent, #00f0ff, transparent)',
                 top: '-6px',
               }}
-              animate={{ top: ['−6px', '100%'] }}
+              animate={{ top: ['-6px', '100%'] }}
               transition={{
                 duration: 1.4,
                 repeat: Infinity,
@@ -142,7 +142,7 @@ export default function Hero() {
             {/* CTA Buttons */}
             <motion.div {...sequence.buttons} className="flex flex-wrap gap-4">
               <button
-                onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
                 className="group relative px-7 py-3.5 rounded-full font-semibold text-sm overflow-hidden"
                 style={{
                   background: 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(181,42,255,0.15))',
@@ -182,7 +182,8 @@ export default function Hero() {
             />
             <Canvas
               camera={{ position: [0, 0, 5], fov: 50 }}
-              gl={{ antialias: true, alpha: true }}
+              dpr={[1, 1.5]}
+              gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
               style={{ background: 'transparent' }}
             >
               <ambientLight intensity={0.2} />
