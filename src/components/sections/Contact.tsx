@@ -141,7 +141,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="relative w-full py-32 px-4 sm:px-10 max-w-5xl mx-auto min-h-screen flex items-center justify-center">
+    <section id="contact" className="relative w-full py-20 sm:py-32 px-4 sm:px-8 md:px-10 max-w-5xl mx-auto min-h-screen flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -151,52 +151,52 @@ export default function Contact() {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-neon-blue/20 via-neon-purple/20 to-neon-cyan/20 blur-[100px] -z-10 rounded-full" />
 
-        <div className="w-full flex flex-col md:flex-row gap-12 p-8 md:p-12 rounded-3xl backdrop-blur-xl bg-black/40 border border-white/10 shadow-2xl">
+        <div className="w-full flex flex-col md:flex-row gap-8 md:gap-12 p-6 sm:p-8 md:p-12 rounded-3xl backdrop-blur-xl bg-black/40 border border-white/10 shadow-2xl">
           {/* Info Side */}
           <div className="w-full md:w-1/2 flex flex-col justify-between">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50 mb-6">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50 mb-4 sm:mb-6">
                 Let&apos;s Build Something Great.
               </h2>
-              <p className="text-white/60 mb-10 text-lg">
+              <p className="text-white/60 mb-8 sm:mb-10 text-base sm:text-lg leading-relaxed">
                 I&apos;m currently open for new opportunities. Whether you have a question or just want to say hi, I&apos;ll try my best to get back to you!
               </p>
             </div>
 
-            <div className="space-y-6">
-              <a href="mailto:batranitika505@gmail.com" className="flex items-center gap-4 text-white/80 hover:text-neon-cyan transition-colors group">
-                <div className="p-3 rounded-full bg-white/5 border border-white/10 group-hover:border-neon-cyan transition-colors">
-                  <Mail className="w-5 h-5" />
+            <div className="space-y-4 sm:space-y-6">
+              <a href="mailto:batranitika505@gmail.com" className="flex items-center gap-3 sm:gap-4 text-white/80 hover:text-neon-cyan transition-colors group min-h-[44px]">
+                <div className="p-2.5 sm:p-3 rounded-full bg-white/5 border border-white/10 group-hover:border-neon-cyan transition-colors shrink-0">
+                  <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <span>batranitika505@gmail.com</span>
+                <span className="text-sm sm:text-base break-all">batranitika505@gmail.com</span>
               </a>
-              <div className="flex items-center gap-4 text-white/80">
-                <div className="p-3 rounded-full bg-white/5 border border-white/10">
-                  <MapPin className="w-5 h-5" />
+              <div className="flex items-center gap-3 sm:gap-4 text-white/80 min-h-[44px]">
+                <div className="p-2.5 sm:p-3 rounded-full bg-white/5 border border-white/10 shrink-0">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <span>Newton School of Technology, Pune</span>
+                <span className="text-sm sm:text-base">Newton School of Technology, Pune</span>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-6 mt-12">
-              <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-8 sm:mt-12">
+              <div className="flex gap-3 sm:gap-4">
                 <a
                   href="https://github.com/batranitika505-tech"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Visit Nitika's GitHub profile"
-                  className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:-translate-y-1 transition-all hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] cursor-none"
+                  className="p-3.5 sm:p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:-translate-y-1 transition-all hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
-                  <GitIcon className="w-6 h-6 text-white" />
+                  <GitIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </a>
                 <a
                   href="https://www.linkedin.com/in/nitika-batra-aa0b52246"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Visit Nitika's LinkedIn profile"
-                  className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:-translate-y-1 transition-all hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] cursor-none"
+                  className="p-3.5 sm:p-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:-translate-y-1 transition-all hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
-                  <Linkedin className="w-6 h-6 text-white" />
+                  <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </a>
               </div>
 
@@ -212,10 +212,10 @@ export default function Contact() {
                   />
                   <label
                     htmlFor="resume-upload"
-                    className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-neon-cyan hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300 cursor-none text-sm font-medium text-white/80 hover:text-white"
+                    className="flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-neon-cyan hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300 text-xs sm:text-sm font-medium text-white/80 hover:text-white cursor-pointer min-h-[44px]"
                   >
-                    <FileText className="w-5 h-5 text-neon-cyan" />
-                    {selectedFile ? `Selected: ${selectedFile.name.substring(0, 15)}${selectedFile.name.length > 15 ? '...' : ''}` : 'Upload Document'}
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-neon-cyan shrink-0" />
+                    <span className="truncate max-w-[180px] sm:max-w-none">{selectedFile ? `Selected: ${selectedFile.name.substring(0, 15)}...` : 'Upload Document'}</span>
                   </label>
 
                   {selectedFile && (
@@ -223,7 +223,7 @@ export default function Contact() {
                       type="button"
                       onClick={handleCancelFile}
                       aria-label="Remove selected attachment"
-                      className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all duration-300 cursor-none flex items-center justify-center"
+                      className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all duration-300 flex items-center justify-center min-h-[44px] min-w-[44px]"
                       title="Remove selected file"
                     >
                       <X className="w-4 h-4" />
@@ -241,7 +241,7 @@ export default function Contact() {
           <div className="w-full md:w-1/2">
             <form
               ref={formRef}
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-4 sm:gap-6"
               onSubmit={handleSubmit}
               encType="multipart/form-data"
             >
@@ -254,7 +254,7 @@ export default function Contact() {
                   placeholder="Your Name"
                   onFocus={() => setFocusedField('name')}
                   onBlur={() => setFocusedField(null)}
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-white/30 focus:outline-none focus:border-neon-purple transition-colors"
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-neon-purple transition-colors min-h-[44px]"
                   required
                 />
                 {focusedField === 'name' && (
@@ -269,7 +269,7 @@ export default function Contact() {
                   placeholder="Your Email"
                   onFocus={() => setFocusedField('email')}
                   onBlur={() => setFocusedField(null)}
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-white/30 focus:outline-none focus:border-neon-blue transition-colors"
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-neon-blue transition-colors min-h-[44px]"
                   required
                 />
                 {focusedField === 'email' && (
@@ -281,10 +281,10 @@ export default function Contact() {
                 <textarea
                   name="message"
                   placeholder="Your Message"
-                  rows={5}
+                  rows={4}
                   onFocus={() => setFocusedField('message')}
                   onBlur={() => setFocusedField(null)}
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-white/30 focus:outline-none focus:border-neon-cyan transition-colors resize-none"
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-neon-cyan transition-colors resize-none"
                   required
                 />
                 {focusedField === 'message' && (
@@ -295,7 +295,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                className="relative w-full py-4 rounded-xl font-bold text-black overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed transition-opacity"
+                className="relative w-full py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base text-black overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed transition-opacity min-h-[48px]"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-neon-blue via-neon-cyan to-neon-purple" />
                 <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-blue opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

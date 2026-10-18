@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { RoundedBox, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -25,7 +25,7 @@ function KeyCap({
   onClick,
 }: { 
   position: [number, number, number];
-  skill: typeof SKILLS[0];
+  skill: typeof SKILLS[0]; 
   isActive: boolean;
   onHover: (skill: typeof SKILLS[0] | null) => void;
   onClick: (skill: typeof SKILLS[0]) => void;
@@ -88,6 +88,10 @@ function Keyboard({
   onKeySelect: (skill: typeof SKILLS[0]) => void;
 }) {
   const groupRef = useRef<THREE.Group>(null);
+  const { viewport } = useThree();
+
+  // Dynamic responsive scaling: fits full 4x2 keyboard in narrow portrait viewports
+  const responsiveScale = viewport.width < 7.8 ? Math.max(viewport.width / 8.2, 0.48) : 1;
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -100,7 +104,7 @@ function Keyboard({
 
   // Arrange keys in a 4x2 grid
   return (
-    <group ref={groupRef} position={[0, 0, 0]}>
+    <group ref={groupRef} position={[0, 0, 0]} scale={responsiveScale}>
       {SKILLS.map((skill, index) => {
         const row = Math.floor(index / 4);
         const col = index % 4;
@@ -145,7 +149,7 @@ export default function Skills() {
   }, []);
 
   return (
-    <section id="skills" className="relative min-h-screen w-full flex flex-col items-center justify-center py-24 overflow-hidden">
+    <section id="skills" className="relative min-h-screen w-full flex flex-col items-center justify-center py-20 sm:py-24 overflow-hidden">
       {/* 3D Keyboard Scene */}
       <div className="absolute inset-0 z-0">
         <Canvas 
@@ -165,12 +169,12 @@ export default function Skills() {
       </div>
 
       {/* Title */}
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 pointer-events-none text-center px-4 w-full">
-        <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50 text-center">
+      <div className="absolute top-12 sm:top-16 left-1/2 -translate-x-1/2 z-10 pointer-events-none text-center px-4 w-full">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50 text-center">
           Tech Stack
         </h2>
-        <p className="text-white/50 text-sm sm:text-base text-center mt-2">
-          Press keys <span className="font-mono text-neon-cyan">[1-8]</span> or click keycaps to inspect
+        <p className="text-white/50 text-xs sm:text-sm md:text-base text-center mt-1.5 sm:mt-2">
+          Press keys <span className="font-mono text-neon-cyan">[1-8]</span> or tap keycaps to inspect
         </p>
       </div>
 
@@ -178,36 +182,45 @@ export default function Skills() {
       <AnimatePresence>
         {selectedSkill && (
           <motion.div
-            initial={{ opacity: 0, x: 50, rotateY: 90 }}
-            animate={{ opacity: 1, x: 0, rotateY: 0 }}
-            exit={{ opacity: 0, x: 50, rotateY: 90 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="absolute right-4 sm:right-10 top-1/4 sm:top-1/3 z-20 w-72 sm:w-80 backdrop-blur-xl bg-black/60 border border-white/20 p-6 rounded-2xl shadow-[0_0_30px_rgba(0,240,255,0.25)] pointer-events-none"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", stiffness: 220, damping: 22 }}
+            className="absolute left-4 right-4 sm:left-auto sm:right-8 md:right-10 top-24 sm:top-1/4 md:top-1/3 z-20 max-w-sm sm:w-80 mx-auto sm:mx-0 backdrop-blur-2xl bg-black/85 border border-neon-cyan/30 p-5 sm:p-6 rounded-2xl shadow-[0_0_35px_rgba(0,240,255,0.25)] pointer-events-auto"
             style={{ perspective: 1000 }}
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-2xl sm:text-3xl font-bold text-neon-cyan">{selectedSkill.name}</h3>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-white/10 text-white/70 border border-white/10">Key: {selectedSkill.shortcut}</span>
+              <h3 className="text-xl sm:text-2xl font-bold text-neon-cyan">{selectedSkill.name}</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/10 text-white/70 border border-white/10">Key: {selectedSkill.shortcut}</span>
+                <button
+                  onClick={() => setSelectedSkill(null)}
+                  aria-label="Dismiss skill info"
+                  className="text-white/40 hover:text-white text-xs px-2 py-0.5 rounded bg-white/5 border border-white/10 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
-            <div className="w-full h-px bg-gradient-to-r from-neon-cyan to-transparent mb-4" />
-            <p className="text-white/80 mb-2 text-sm sm:text-base"><span className="font-semibold text-neon-purple">Experience:</span> {selectedSkill.exp}</p>
+            <div className="w-full h-px bg-gradient-to-r from-neon-cyan to-transparent mb-3 sm:mb-4" />
+            <p className="text-white/80 mb-1.5 sm:mb-2 text-xs sm:text-sm"><span className="font-semibold text-neon-purple">Experience:</span> {selectedSkill.exp}</p>
             <p className="text-white/60 text-xs sm:text-sm leading-relaxed">{selectedSkill.desc}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Mobile/Accessible Quick Badges */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 w-full max-w-4xl px-4 flex flex-wrap justify-center gap-2 pointer-events-auto">
+      <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 z-10 w-full max-w-4xl px-4 flex flex-wrap justify-center gap-1.5 sm:gap-2 pointer-events-auto">
         {SKILLS.map((skill) => {
           const isSelected = selectedSkill?.name === skill.name;
           return (
             <button
               key={skill.name}
               onClick={() => setSelectedSkill(skill)}
-              className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 border ${
+              className={`px-3 py-1.5 sm:py-2 rounded-full text-xs font-mono transition-all duration-300 border min-h-[38px] flex items-center justify-center ${
                 isSelected 
                   ? 'bg-neon-cyan/20 border-neon-cyan text-white shadow-[0_0_15px_rgba(0,240,255,0.4)]'
-                  : 'bg-black/50 border-white/10 text-white/70 hover:border-white/30 hover:text-white'
+                  : 'bg-black/60 border-white/10 text-white/70 hover:border-white/30 hover:text-white'
               }`}
             >
               <span className="text-neon-cyan mr-1">[{skill.shortcut}]</span> {skill.name}

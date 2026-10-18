@@ -44,7 +44,7 @@ export default function About() {
   ];
 
   return (
-    <section id="about" ref={containerRef} className="relative min-h-screen w-full flex items-center justify-center py-20 px-4 sm:px-10 perspective-1000">
+    <section id="about" ref={containerRef} className="relative min-h-screen w-full flex items-center justify-center py-16 sm:py-24 px-4 sm:px-8 md:px-10 perspective-1000">
       <motion.div
         style={{ y, opacity }}
         className="w-full max-w-6xl"
@@ -53,10 +53,10 @@ export default function About() {
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           style={{ rotateX: springRotateX, rotateY: springRotateY }}
-          className="relative w-full rounded-3xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 shadow-[0_0_50px_rgba(0,240,255,0.1)] p-8 md:p-12 flex flex-col md:flex-row gap-10"
+          className="relative w-full rounded-3xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 shadow-[0_0_50px_rgba(0,240,255,0.1)] p-6 sm:p-8 md:p-12 flex flex-col md:flex-row gap-8 md:gap-10"
         >
           {/* Image Side */}
-          <div className="w-full md:w-1/2 h-[300px] md:h-[500px] relative rounded-2xl overflow-hidden bg-black/20 border border-white/5 shadow-inner">
+          <div className="w-full md:w-1/2 h-[280px] sm:h-[380px] md:h-[500px] relative rounded-2xl overflow-hidden bg-black/20 border border-white/5 shadow-inner">
             <Image
               src="/profile.webp"
               alt="Nitika - Software Engineer"
@@ -78,11 +78,11 @@ export default function About() {
 
           {/* Text Side */}
           <div className="w-full md:w-1/2 flex flex-col justify-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
               About Me
             </h2>
 
-            <div className="space-y-4 text-lg md:text-xl text-white/80 font-light">
+            <div className="space-y-3 sm:space-y-4 text-base sm:text-lg md:text-xl text-white/80 font-light">
               {textLines.map((line, index) => (
                 <motion.div
                   key={index}
@@ -97,7 +97,7 @@ export default function About() {
             </div>
 
             <motion.div
-              className="mt-10"
+              className="mt-8 sm:mt-10"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -105,7 +105,7 @@ export default function About() {
             >
               <button 
                 onClick={() => document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth' })}
-                className="px-8 py-3 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors relative overflow-hidden group cursor-pointer"
+                className="px-7 sm:px-8 py-3 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors relative overflow-hidden group cursor-pointer min-h-[44px] inline-flex items-center justify-center text-sm font-semibold"
               >
                 <span className="relative z-10">Discover More</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-neon-blue to-neon-purple opacity-0 group-hover:opacity-20 transition-opacity" />

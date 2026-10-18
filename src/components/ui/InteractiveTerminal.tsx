@@ -173,7 +173,7 @@ export default function InteractiveTerminal() {
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.25 }}
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md pointer-events-auto"
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/70 backdrop-blur-md pointer-events-auto"
         >
           {/* Main Terminal Window */}
           <motion.div
@@ -181,27 +181,27 @@ export default function InteractiveTerminal() {
             animate={{ y: 0 }}
             exit={{ y: 50 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-4xl h-[60vh] bg-black/90 border border-neon-cyan/30 rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,240,255,0.15)] flex flex-col font-mono"
+            className="w-full max-w-4xl h-[82vh] sm:h-[65vh] max-h-[90vh] bg-black/92 border border-neon-cyan/30 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,240,255,0.2)] flex flex-col font-mono"
           >
             {/* Terminal Header */}
-            <div className="flex items-center justify-between px-6 py-3 bg-white/5 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 bg-white/5 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                <span className="w-3 h-3 rounded-full bg-[#27c93f]" />
-                <span className="ml-3 text-xs text-white/40 select-none">nitika@space-deck: ~ (press ~ to exit)</span>
+                <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-[#ff5f56]" />
+                <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-[#ffbd2e]" />
+                <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-[#27c93f]" />
+                <span className="ml-2 sm:ml-3 text-[11px] sm:text-xs text-white/50 select-none truncate max-w-[200px] sm:max-w-none">nitika@space-deck:~ (Esc or ~ to exit)</span>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
                 aria-label="Close terminal"
-                className="text-white/40 hover:text-white transition-colors text-sm"
+                className="text-white/50 hover:text-white transition-colors text-base min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-white/5"
               >
                 ✕
               </button>
             </div>
 
             {/* Terminal Screen / Output Log */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-3 scrollbar-thin select-text">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-2 sm:space-y-3 scrollbar-thin select-text text-xs sm:text-sm">
               {history.map((line, index) => (
                 <div 
                   key={index} 
@@ -219,16 +219,18 @@ export default function InteractiveTerminal() {
             </div>
 
             {/* Terminal Input Area */}
-            <div className="p-6 bg-white/5 border-t border-white/10 flex items-center gap-2">
-              <span className="text-neon-cyan font-bold select-none">nitika-space-deck:~$</span>
+            <div className="px-4 py-3 sm:p-6 bg-white/5 border-t border-white/10 flex items-center gap-2 shrink-0">
+              <span className="text-neon-cyan font-bold select-none text-xs sm:text-sm shrink-0">
+                <span className="hidden sm:inline">nitika-space-deck:</span>~$
+              </span>
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleInputKeyDown}
-                className="flex-1 bg-transparent border-none outline-none text-white font-mono caret-neon-cyan"
-                placeholder="type command here..."
+                className="flex-1 bg-transparent border-none outline-none text-white font-mono text-xs sm:text-sm caret-neon-cyan min-h-[36px]"
+                placeholder="type command (help, projects...)"
               />
             </div>
           </motion.div>

@@ -80,128 +80,128 @@ export default function Hero() {
   };
 
   return (
-    <section id="home" className="relative min-h-screen w-full overflow-hidden">
-      {/* Left — Text Content */}
-      <div className="absolute inset-0 z-10 flex items-center pointer-events-none">
-        <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 grid grid-cols-1 md:grid-cols-2 gap-10">
+    <section id="home" className="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-24 pb-14 md:py-0">
+      {/* Content Grid */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center">
 
-          {/* ——— LEFT COLUMN ——— */}
-          <div className="flex flex-col justify-center pointer-events-auto">
+        {/* ——— LEFT COLUMN ——— */}
+        <div className="flex flex-col justify-center pointer-events-auto order-1 md:order-1">
 
-            {/* Greeting */}
-            <motion.p
-              {...sequence.greeting}
-              className="text-base sm:text-lg font-mono text-white/40 tracking-[0.25em] uppercase mb-4"
-            >
-              Hello, World — I&apos;m
-            </motion.p>
-
-            {/* Name */}
-            <motion.div {...sequence.name} className="mb-6 relative">
-              <h1 className="name-sheen text-[13vw] sm:text-[10vw] md:text-[7.5vw] font-black leading-none tracking-tighter text-transparent bg-clip-text"
-                style={{
-                  backgroundImage: 'linear-gradient(135deg, #ffffff 0%, #c0c0c0 40%, #ffffff 60%, #aaaaaa 100%)',
-                  WebkitBackgroundClip: 'text',
-                  textShadow: '0 0 80px rgba(0,240,255,0.15)',
-                }}
-              >
-                NITIKA
-              </h1>
-              {/* Subtle glow pulse under name */}
-              <motion.div
-                className="absolute -bottom-4 left-0 w-3/4 h-[1px]"
-                style={{ background: 'linear-gradient(to right, rgba(0,240,255,0.5), transparent)' }}
-                animate={{ scaleX: [0.8, 1, 0.8], opacity: [0.4, 0.8, 0.4] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            </motion.div>
-
-            {/* Roles */}
-            <motion.div {...sequence.roles} className="mb-4 space-y-1">
-              {['Full Stack Developer', 'AI Enthusiast'].map((role, i) => (
-                <div key={role} className="flex items-center gap-3">
-                  <div className="w-6 h-[1px]" style={{ background: i === 0 ? '#00f0ff' : '#b52aff' }} />
-                  <span
-                    className="text-lg sm:text-xl font-light tracking-wide"
-                    style={{ color: i === 0 ? 'rgba(0,240,255,0.9)' : 'rgba(181,42,255,0.9)' }}
-                  >
-                    {role}
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-
-            {/* Tagline */}
-            <motion.p
-              {...sequence.tagline}
-              className="text-base text-white/50 font-light leading-relaxed max-w-sm mb-10"
-            >
-              Building beautiful digital experiences at the intersection of design and high-performance engineering.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div {...sequence.buttons} className="flex flex-wrap gap-4">
-              <button
-                onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-                className="group relative px-7 py-3.5 rounded-full font-semibold text-sm overflow-hidden"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(181,42,255,0.15))',
-                  border: '1px solid rgba(0,240,255,0.3)',
-                }}
-              >
-                <span className="relative z-10 text-white">Explore Projects</span>
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: 'linear-gradient(135deg, rgba(0,240,255,0.25), rgba(181,42,255,0.25))' }}
-                />
-              </button>
-              <a
-                href="/nitikanew.pdf"
-                download="Nitika_Batra_Resume.pdf"
-                className="group relative px-7 py-3.5 rounded-full font-semibold text-sm overflow-hidden"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                }}
-              >
-                <span className="relative z-10 text-white/80 group-hover:text-white transition-colors duration-200">Download Resume</span>
-              </a>
-            </motion.div>
-
-          </div>
-
-          {/* ——— RIGHT COLUMN — 3D Canvas ——— */}
-          <motion.div
-            {...sequence.canvas}
-            className="relative h-[400px] md:h-[600px] w-full rounded-3xl overflow-hidden pointer-events-auto"
+          {/* Greeting */}
+          <motion.p
+            {...sequence.greeting}
+            className="text-xs sm:text-base font-mono text-white/40 tracking-[0.25em] uppercase mb-3 sm:mb-4"
           >
-            {/* Glow frame */}
-            <div
-              className="absolute inset-0 rounded-3xl pointer-events-none z-10"
-              style={{ boxShadow: 'inset 0 0 60px rgba(0,240,255,0.05)' }}
-            />
-            <Canvas
-              camera={{ position: [0, 0, 5], fov: 50 }}
-              dpr={[1, 1.5]}
-              gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-              style={{ background: 'transparent' }}
+            Hello, World — I&apos;m
+          </motion.p>
+
+          {/* Name */}
+          <motion.div {...sequence.name} className="mb-4 sm:mb-6 relative">
+            <h1 className="name-sheen text-[13vw] sm:text-[10vw] md:text-[7.5vw] font-black leading-none tracking-tighter text-transparent bg-clip-text"
+              style={{
+                backgroundImage: 'linear-gradient(135deg, #ffffff 0%, #c0c0c0 40%, #ffffff 60%, #aaaaaa 100%)',
+                WebkitBackgroundClip: 'text',
+                textShadow: '0 0 80px rgba(0,240,255,0.15)',
+              }}
             >
-              <ambientLight intensity={0.2} />
-              <HeroObject mouseX={mouseX} mouseY={mouseY} />
-            </Canvas>
-            {/* Corner decorators */}
-            {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
-              <div key={i} className={`absolute ${pos} w-6 h-6 pointer-events-none z-20`}>
-                <div className="w-full h-[1px] bg-neon-cyan/30" />
-                <div className="h-full w-[1px] bg-neon-cyan/30" />
+              NITIKA
+            </h1>
+            {/* Subtle glow pulse under name */}
+            <motion.div
+              className="absolute -bottom-3 sm:-bottom-4 left-0 w-3/4 h-[1px]"
+              style={{ background: 'linear-gradient(to right, rgba(0,240,255,0.5), transparent)' }}
+              animate={{ scaleX: [0.8, 1, 0.8], opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </motion.div>
+
+          {/* Roles */}
+          <motion.div {...sequence.roles} className="mb-4 space-y-1">
+            {['Full Stack Developer', 'AI Enthusiast'].map((role, i) => (
+              <div key={role} className="flex items-center gap-3">
+                <div className="w-5 sm:w-6 h-[1px]" style={{ background: i === 0 ? '#00f0ff' : '#b52aff' }} />
+                <span
+                  className="text-base sm:text-xl font-light tracking-wide"
+                  style={{ color: i === 0 ? 'rgba(0,240,255,0.9)' : 'rgba(181,42,255,0.9)' }}
+                >
+                  {role}
+                </span>
               </div>
             ))}
           </motion.div>
+
+          {/* Tagline */}
+          <motion.p
+            {...sequence.tagline}
+            className="text-sm sm:text-base text-white/50 font-light leading-relaxed max-w-sm mb-8 sm:mb-10"
+          >
+            Building beautiful digital experiences at the intersection of design and high-performance engineering.
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div {...sequence.buttons} className="flex flex-wrap gap-3 sm:gap-4">
+            <button
+              onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+              className="group relative px-6 sm:px-7 py-3 sm:py-3.5 rounded-full font-semibold text-xs sm:text-sm overflow-hidden min-h-[44px] flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(181,42,255,0.15))',
+                border: '1px solid rgba(0,240,255,0.3)',
+              }}
+            >
+              <span className="relative z-10 text-white">Explore Projects</span>
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ background: 'linear-gradient(135deg, rgba(0,240,255,0.25), rgba(181,42,255,0.25))' }}
+              />
+            </button>
+            <a
+              href="/resume.pdf"
+              download="Nitika_Batra_Resume.pdf"
+              className="group relative px-6 sm:px-7 py-3 sm:py-3.5 rounded-full font-semibold text-xs sm:text-sm overflow-hidden min-h-[44px] flex items-center justify-center"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.15)',
+              }}
+            >
+              <span className="relative z-10 text-white/80 group-hover:text-white transition-colors duration-200">Download Resume</span>
+            </a>
+          </motion.div>
+
         </div>
+
+        {/* ——— RIGHT COLUMN — 3D Canvas ——— */}
+        <motion.div
+          {...sequence.canvas}
+          className="relative h-[260px] sm:h-[360px] md:h-[580px] w-full rounded-3xl overflow-hidden pointer-events-auto order-2 md:order-2"
+        >
+          {/* Glow frame */}
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none z-10"
+            style={{ boxShadow: 'inset 0 0 60px rgba(0,240,255,0.05)' }}
+          />
+          <Canvas
+            camera={{ position: [0, 0, 5], fov: 50 }}
+            dpr={[1, 1.5]}
+            gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+            style={{ background: 'transparent' }}
+          >
+            <ambientLight intensity={0.2} />
+            <HeroObject mouseX={mouseX} mouseY={mouseY} />
+          </Canvas>
+          {/* Corner decorators */}
+          {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
+            <div key={i} className={`absolute ${pos} w-5 sm:w-6 h-5 sm:h-6 pointer-events-none z-20`}>
+              <div className="w-full h-[1px] bg-neon-cyan/30" />
+              <div className="h-full w-[1px] bg-neon-cyan/30" />
+            </div>
+          ))}
+        </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <ParticleScrollIndicator />
+      {/* Scroll indicator - desktop only */}
+      <div className="hidden md:block">
+        <ParticleScrollIndicator />
+      </div>
 
       {/* Bottom gradient vignette */}
       <div
